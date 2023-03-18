@@ -2,4 +2,8 @@
     <string name="app_name">Video Player</string>
     <string name="all_videos">All Videos</string>
     <string name="all_folders">All Folders</string>
+
+    <string name="total_videos">Total Videos:</string>
+    <string name="total_folders">Total Folders:</string>
+
 </resources>

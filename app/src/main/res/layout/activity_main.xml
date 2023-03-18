@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/linearLayoutCompat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -21,8 +21,7 @@
             android:id="@+id/fragmentFL"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-             />
+            android:layout_weight="1" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNav"
@@ -33,6 +32,6 @@
             app:itemTextColor="@color/black"
             android:layout_gravity="bottom"
             app:menu="@menu/bottom_nav" />
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

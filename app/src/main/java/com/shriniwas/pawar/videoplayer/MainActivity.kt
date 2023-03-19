@@ -1,6 +1,7 @@
 package com.shriniwas.pawar.videoplayer
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -11,6 +12,7 @@ import android.os.Environment
 import android.provider.Settings
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.shriniwas.pawar.videoplayer.databinding.ActivityMainBinding
 
@@ -44,25 +46,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-//    private fun requestRuntimePermission(): Boolean {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            if (ActivityCompat.checkSelfPermission(
-//                    this,
-//                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-//                ) != PackageManager.PERMISSION_GRANTED
-//            ) {
-//                ActivityCompat.requestPermissions(
-//                    this,
-//                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-//                    13
-//                )
-//                return false
-//
-//            }
-//        }
-//        return true
-//
-//    }
+
 
 //    override fun onRequestPermissionsResult(
 //        requestCode: Int,

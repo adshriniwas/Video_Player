@@ -24,6 +24,7 @@ class PermissionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPermissionBinding.inflate(layoutInflater)
+        setTheme(R.style.coolPinkNav)
         setContentView(binding.root)
 
         binding.btnPermission.setOnClickListener(View.OnClickListener {

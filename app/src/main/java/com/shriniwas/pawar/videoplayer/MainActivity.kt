@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.shriniwas.pawar.videoplayer.databinding.ActivityMainBinding
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,6 +42,17 @@ class MainActivity : AppCompatActivity() {
                 R.id.foldersView -> setFragment(FoldersFragment())
             }
             return@setOnItemSelectedListener true
+        }
+
+        binding.navView.setNavigationItemSelectedListener {
+            when(it.itemId){
+                R.id.feedbackNav -> Toast.makeText(this, "feedback", Toast.LENGTH_SHORT).show()
+                R.id.themesNav -> Toast.makeText(this, "themes", Toast.LENGTH_SHORT).show()
+                R.id.sortOrderNav -> Toast.makeText(this, "sort order", Toast.LENGTH_SHORT).show()
+                R.id.aboutNav -> Toast.makeText(this, "about", Toast.LENGTH_SHORT).show()
+                R.id.exitNav -> exitProcess(1)
+            }
+            return@setNavigationItemSelectedListener true
         }
     }
 

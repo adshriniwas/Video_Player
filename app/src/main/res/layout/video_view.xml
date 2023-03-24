@@ -4,7 +4,11 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="2dp">
+    android:padding="2dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?attr/selectableItemBackground"
+    android:layout_marginBottom="5dp">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/videoImg"
@@ -27,7 +31,8 @@
             android:layout_height="30dp"
             android:text="@string/video_name"
             android:textColor="@color/black"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:maxLines="1"/>
 
         <TextView
             android:id="@+id/folderName"
@@ -35,6 +40,7 @@
             android:layout_height="20dp"
             android:text="@string/folder_name"
             android:gravity="center_vertical"
+            android:maxLines="1"
             />
     </LinearLayout>
 

@@ -25,19 +25,13 @@ class VideosFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_videos, container, false)
 
         val binding = FragmentVideosBinding.bind(view)
-        val tempList = ArrayList<String>()
-        tempList.add("First Video")
-        tempList.add("Second Video")
-        tempList.add("Third Video")
-        tempList.add("Fourth Video")
-        tempList.add("Fifth Video")
-        tempList.add("Sixth Video")
+
 
         binding.videoRV.setHasFixedSize(true)
         binding.videoRV.setItemViewCacheSize(10)
 
         binding.videoRV.layoutManager = LinearLayoutManager(requireContext())
-        binding.videoRV.adapter = VideoAdapter(requireContext(), tempList)
+        binding.videoRV.adapter = VideoAdapter(requireContext(), MainActivity.videoList)
         return view
     }
 

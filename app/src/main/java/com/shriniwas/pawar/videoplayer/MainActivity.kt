@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
+import android.provider.MediaStore
 import android.provider.Settings
 import android.view.MenuItem
 import android.widget.Toast
@@ -17,6 +18,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.shriniwas.pawar.videoplayer.databinding.ActivityMainBinding
+import java.io.File
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
@@ -24,12 +26,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var toggle: ActionBarDrawerToggle
 
+    companion object{
+        lateinit var videoList: ArrayList<Video>
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setTheme(R.style.coolPinkNav)
         setContentView(binding.root)
 //        requestRuntimePermission()
+        videoList = getAllVideos()
         toggle = ActionBarDrawerToggle(this, binding.root, R.string.open, R.string.close)
         binding.root.addDrawerListener(toggle)
         toggle.syncState()
@@ -71,22 +78,41 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun getAllVideos(): ArrayList<Video>{
+        val tempList = ArrayList<Video>()
+        val projection = arrayOf(MediaStore.Video.Media.TITLE, MediaStore.Video.Media.SIZE, MediaStore.Video.Media._ID,
+            MediaStore.Video.Media.BUCKET_DISPLAY_NAME, MediaStore.Video.Media.DATA, MediaStore.Video.Media.DATE_ADDED,
+            MediaStore.Video.Media.DURATION)
+        val cursor = this.contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, null, null,
+            MediaStore.Video.Media.DATE_ADDED + " DESC")
+
+        if (cursor != null){
+            if (cursor.moveToNext())
+                do {
+                    val titleC = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.TITLE))
+                    val idC = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID))
+                    val folderC = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME))
+                    val sizeC = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE))
+                    val pathC = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA))
+                    val durationC = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)).toLong()
+
+                    try {
+                        val file = File(pathC)
+                        val artUriC = Uri.fromFile(file)
+                        val video = Video(title = titleC, id = idC, folderName = folderC, duration = durationC, size = sizeC, path = pathC,
+                            artUri = artUriC)
+                        if (file.exists()) tempList.add(video)
 
 
+                    }catch (e: Exception){
 
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//
-//        if (requestCode == 13){
-//            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-//                Toast.makeText(this,"Permission Granted",Toast.LENGTH_SHORT).show()
-//            }else {
-//                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),13)
-//            }
-//        }
-//    }
+                    }
+
+                }while (cursor.moveToNext())
+                cursor?.close()
+        }
+
+        return tempList
+    }
+
 }

@@ -8,10 +8,18 @@
 
 
     <TextView
+        android:id="@+id/totalVideos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/total_videos"
         android:textColor="@color/black"
         android:layout_margin="10dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/videoRV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical"
+        />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

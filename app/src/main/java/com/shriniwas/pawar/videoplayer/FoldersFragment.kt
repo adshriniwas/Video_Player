@@ -1,5 +1,6 @@
 package com.shriniwas.pawar.videoplayer
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -20,25 +21,10 @@ class FoldersFragment : Fragment() {
         }
     }
 
-    override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    @SuppressLint("SetTextI18n")
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_folders, container, false)
-        val tempList = ArrayList<String>()
-
-        tempList.add("Folder 1")
-        tempList.add("Folder 2")
-        tempList.add("Folder 3")
-        tempList.add("Folder 4")
-        tempList.add("Folder 5")
-        tempList.add("Folder 6")
-        tempList.add("Folder 7")
-        tempList.add("Folder 8")
-        tempList.add("Folder 9")
-        tempList.add("Folder 10")
-        tempList.add("Folder 11")
-        tempList.add("Folder 12")
-
-
         val binding = FragmentFoldersBinding.bind(view)
 
 
@@ -46,7 +32,8 @@ class FoldersFragment : Fragment() {
         binding.foldersRV.setItemViewCacheSize(10)
 
         binding.foldersRV.layoutManager = LinearLayoutManager(requireContext())
-        binding.foldersRV.adapter = FoldersAdapter(requireContext(), tempList)
+        binding.foldersRV.adapter = FoldersAdapter(requireContext(), MainActivity.folderList)
+        binding.totalFolders.text = "Total Folders: ${MainActivity.folderList.size}"
         return view
     }
 

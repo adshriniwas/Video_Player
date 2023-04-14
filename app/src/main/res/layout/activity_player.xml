@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".PlayerActivity">
 
-    <com.google.android.exoplayer2.ui.PlayerView
+    <androidx.media3.ui.PlayerView
         android:id="@+id/playerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -96,7 +96,7 @@
         <ImageButton
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/exo_controls_repeat_off"
+            android:src="@drawable/exo_icon_repeat_off"
             android:backgroundTint="@android:color/transparent"
             android:contentDescription="@string/repeat_button"
             app:tint="@color/white" />

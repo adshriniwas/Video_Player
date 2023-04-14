@@ -1,9 +1,14 @@
 package com.shriniwas.pawar.videoplayer
 
+import android.media.browse.MediaBrowser
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.SimpleExoPlayer
+
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+
+
+
 import com.shriniwas.pawar.videoplayer.databinding.ActivityPlayerBinding
 
 class PlayerActivity : AppCompatActivity() {
@@ -11,7 +16,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
 
     companion object {
-        private lateinit var player: SimpleExoPlayer
+        private lateinit var player: ExoPlayer
         lateinit var playerList: ArrayList<Video>
         var position: Int = -1
     }
@@ -59,7 +64,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.videoTitle.text = playerList[position].title
         binding.videoTitle.isSelected = true
 
-        player = SimpleExoPlayer.Builder(this).build()
+        player = ExoPlayer.Builder(this).build()
         binding.playerView.player = player
 
 

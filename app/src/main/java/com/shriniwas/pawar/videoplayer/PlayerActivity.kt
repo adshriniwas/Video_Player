@@ -8,10 +8,10 @@ import com.shriniwas.pawar.videoplayer.databinding.ActivityPlayerBinding
 
 class PlayerActivity : AppCompatActivity() {
 
-    lateinit var binding: ActivityPlayerBinding
+    private lateinit var binding: ActivityPlayerBinding
 
     companion object {
-        lateinit var player: SimpleExoPlayer
+        private lateinit var player: SimpleExoPlayer
         lateinit var playerList: ArrayList<Video>
         var position: Int = -1
     }
@@ -22,6 +22,7 @@ class PlayerActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         initializeLayout()
+        initializeBinding()
 
     }
 
@@ -30,19 +31,34 @@ class PlayerActivity : AppCompatActivity() {
             "AllVideos" -> {
                 playerList = ArrayList()
                 playerList.addAll(MainActivity.videoList)
-
+                createPlayer()
             }
             "FolderActivity" -> {
                 playerList = ArrayList()
                 playerList.addAll(FoldersActivity.currentFolderVideos)
-
+                createPlayer()
             }
 
         }
-        createPlayer()
+
+    }
+
+    private fun initializeBinding() {
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
+
+        binding.playPauseBtn.setOnClickListener {
+            if (player.isPlaying) pauseVideo()
+            else playVideo()
+        }
     }
 
     private fun createPlayer() {
+
+        binding.videoTitle.text = playerList[position].title
+        binding.videoTitle.isSelected = true
+
         player = SimpleExoPlayer.Builder(this).build()
         binding.playerView.player = player
 
@@ -53,7 +69,17 @@ class PlayerActivity : AppCompatActivity() {
 
         player.setMediaItem(mediaItem)
         player.prepare()
+        playVideo()
+    }
+
+    private fun playVideo(){
+        binding.playPauseBtn.setImageResource(R.drawable.pause_icon)
         player.play()
+    }
+
+    private fun pauseVideo(){
+        binding.playPauseBtn.setImageResource(R.drawable.play_icon)
+        player.pause()
     }
 
     override fun onDestroy() {

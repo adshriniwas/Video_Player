@@ -1,8 +1,14 @@
 package com.shriniwas.pawar.videoplayer
 
 import android.media.browse.MediaBrowser
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Window
+import android.view.WindowManager
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 
@@ -21,8 +27,22 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+        }
         binding = ActivityPlayerBinding.inflate(layoutInflater)
+
+
+        setTheme(R.style.playerActivityTheme)
         setContentView(binding.root)
+        //        for immersive mode
+        WindowCompat.setDecorFitsSystemWindows(window,true)
+        WindowInsetsControllerCompat(window, binding.root).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.statusBars())
+//            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_SWIPE
+
+        }
 
         initializeLayout()
         initializeBinding()
@@ -55,6 +75,14 @@ class PlayerActivity : AppCompatActivity() {
             if (player.isPlaying) pauseVideo()
             else playVideo()
         }
+
+        binding.nextBtn.setOnClickListener {
+            nextPrevVideo()
+        }
+
+        binding.prevBtn.setOnClickListener {
+            nextPrevVideo(isNext = false)
+        }
     }
 
     private fun createPlayer() {
@@ -81,6 +109,36 @@ class PlayerActivity : AppCompatActivity() {
     private fun pauseVideo(){
         binding.playPauseBtn.setImageResource(R.drawable.play_icon)
         player.pause()
+    }
+
+    private fun nextPrevVideo(isNext: Boolean = true) {
+        if (isNext) {
+            player.stop()
+            setPosition()
+            createPlayer()
+        }
+        else {
+            player.stop()
+            setPosition(isIncrement = false)
+            createPlayer()
+        }
+
+    }
+
+    private fun setPosition(isIncrement: Boolean = true) {
+        if (isIncrement){
+            if (playerList.size -1 == position){
+                position = 0
+            }else{
+                ++position
+            }
+        }else {
+            if (position == 0){
+                position = playerList.size - 1
+            }else{
+                --position
+            }
+        }
     }
 
     override fun onDestroy() {

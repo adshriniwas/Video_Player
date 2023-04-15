@@ -9,8 +9,11 @@ import android.view.WindowManager
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 
 
 import com.shriniwas.pawar.videoplayer.databinding.ActivityPlayerBinding
@@ -23,6 +26,8 @@ class PlayerActivity : AppCompatActivity() {
         private lateinit var player: ExoPlayer
         lateinit var playerList: ArrayList<Video>
         var position: Int = -1
+        private var repeat: Boolean = false
+        private var isFullscreen: Boolean = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,9 +69,15 @@ class PlayerActivity : AppCompatActivity() {
 
         }
 
+        if (repeat) binding.repeatBtn.setImageResource(com.google.android.exoplayer2.ui.R.drawable.exo_controls_repeat_all)
+        else binding.repeatBtn.setImageResource(com.google.android.exoplayer2.R.drawable.exo_controls_repeat_off)
+
     }
 
     private fun initializeBinding() {
+
+
+
         binding.backBtn.setOnClickListener {
             finish()
         }
@@ -83,9 +94,37 @@ class PlayerActivity : AppCompatActivity() {
         binding.prevBtn.setOnClickListener {
             nextPrevVideo(isNext = false)
         }
+
+        binding.repeatBtn.setOnClickListener {
+            if (repeat) {
+                repeat = false
+                player.repeatMode = Player.REPEAT_MODE_OFF
+                binding.repeatBtn.setImageResource(com.google.android.exoplayer2.R.drawable.exo_controls_repeat_off)
+            }else {
+                repeat = true
+                player.repeatMode = Player.REPEAT_MODE_ONE
+                binding.repeatBtn.setImageResource(com.google.android.exoplayer2.R.drawable.exo_controls_repeat_all)
+            }
+        }
+
+        binding.fullScreenBtn.setOnClickListener {
+            if (isFullscreen){
+                isFullscreen = false
+                playInFullscreen(enable = false)
+            }else{
+                isFullscreen = true
+                playInFullscreen(enable = true)
+            }
+        }
     }
 
     private fun createPlayer() {
+
+        try {
+            player.release()
+        }catch (e: Exception){
+
+        }
 
         binding.videoTitle.text = playerList[position].title
         binding.videoTitle.isSelected = true
@@ -99,6 +138,16 @@ class PlayerActivity : AppCompatActivity() {
         player.setMediaItem(mediaItem)
         player.prepare()
         playVideo()
+
+        player.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                super.onPlaybackStateChanged(playbackState)
+
+                if (playbackState == Player.STATE_ENDED) nextPrevVideo()
+            }
+        })
+
+        playInFullscreen(enable = isFullscreen)
     }
 
     private fun playVideo(){
@@ -113,12 +162,12 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun nextPrevVideo(isNext: Boolean = true) {
         if (isNext) {
-            player.stop()
+//            player.stop()
             setPosition()
             createPlayer()
         }
         else {
-            player.stop()
+//            player.stop()
             setPosition(isIncrement = false)
             createPlayer()
         }
@@ -126,18 +175,33 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun setPosition(isIncrement: Boolean = true) {
-        if (isIncrement){
-            if (playerList.size -1 == position){
-                position = 0
-            }else{
-                ++position
+
+        if (!repeat){
+            if (isIncrement){
+                if (playerList.size -1 == position){
+                    position = 0
+                }else{
+                    ++position
+                }
+            }else {
+                if (position == 0){
+                    position = playerList.size - 1
+                }else{
+                    --position
+                }
             }
+        }
+    }
+
+    private fun playInFullscreen(enable: Boolean){
+        if (enable){
+            binding.playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
+            player.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
+            binding.fullScreenBtn.setImageResource(R.drawable.fullscreen_exit_icon)
         }else {
-            if (position == 0){
-                position = playerList.size - 1
-            }else{
-                --position
-            }
+            binding.playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+            player.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT
+            binding.fullScreenBtn.setImageResource(R.drawable.fullscreen_icon)
         }
     }
 

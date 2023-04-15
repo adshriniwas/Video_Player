@@ -95,6 +95,7 @@
         android:gravity="end|bottom">
 
         <ImageButton
+            android:id="@+id/repeatBtn"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/exo_icon_repeat_off"
@@ -124,9 +125,10 @@
             app:tint="@color/white"
             />
         <ImageButton
+            android:id="@+id/fullScreenBtn"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/exo_icon_fullscreen_enter"
+            android:src="@drawable/fullscreen_icon"
             android:backgroundTint="@android:color/transparent"
             android:contentDescription="@string/fullscreen_button"
             app:tint="@color/white"

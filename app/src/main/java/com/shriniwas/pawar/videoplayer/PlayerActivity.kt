@@ -3,10 +3,8 @@ package com.shriniwas.pawar.videoplayer
 import android.media.browse.MediaBrowser
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-
-import androidx.media3.common.MediaItem
-import androidx.media3.exoplayer.ExoPlayer
-
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
 
 
 import com.shriniwas.pawar.videoplayer.databinding.ActivityPlayerBinding
@@ -69,8 +67,6 @@ class PlayerActivity : AppCompatActivity() {
 
 
         val mediaItem = MediaItem.fromUri(playerList[position].artUri)
-
-
 
         player.setMediaItem(mediaItem)
         player.prepare()

@@ -1,9 +1,8 @@
 package com.shriniwas.pawar.videoplayer
 
+
 import android.graphics.drawable.ColorDrawable
-import android.media.browse.MediaBrowser
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,19 +10,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-
-
 import com.shriniwas.pawar.videoplayer.databinding.ActivityPlayerBinding
 import com.shriniwas.pawar.videoplayer.databinding.MoreFeaturesBinding
+import java.util.*
+
 
 class PlayerActivity : AppCompatActivity() {
 
@@ -31,12 +33,13 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var runnable: Runnable
 
     companion object {
-        private lateinit var player: ExoPlayer
+        private lateinit var player: SimpleExoPlayer
         lateinit var playerList: ArrayList<Video>
         var position: Int = -1
         private var repeat: Boolean = false
         private var isFullscreen: Boolean = false
         private var isLocked: Boolean = false
+        lateinit var trackSelector: DefaultTrackSelector
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -153,6 +156,40 @@ class PlayerActivity : AppCompatActivity() {
                 .setBackground(ColorDrawable(0x803700B3.toInt()))
                 .create()
             dialog.show()
+
+            bindingMF.audioTrack.setOnClickListener {
+                dialog.dismiss()
+                playVideo()
+                val audioTrack = ArrayList<String>()
+
+
+
+                for(i in 0 until player.currentTrackGroups.length){
+
+                    val format = player.currentTrackGroups[i].getFormat(0).sampleMimeType
+                    val lang = player.currentTrackGroups[i].getFormat(0).language
+                    val id = player.currentTrackGroups[i].getFormat(0).id
+
+                    if (format!!.contains("audio") && id != null && lang != null) {
+                        //System.out.println(lang + " " + id);
+                        audioTrack.add(Locale(player.currentTrackGroups.get(i).getFormat(0).language.toString()).displayLanguage)
+                    }
+
+                }
+
+                val tempTracks = audioTrack.toArray(arrayOfNulls<CharSequence>(audioTrack.size))
+
+                MaterialAlertDialogBuilder(this, R.style.alertDialog)
+                    .setTitle("Select Language")
+                    .setOnCancelListener { playVideo() }
+                    .setBackground(ColorDrawable(0x803700B3.toInt()))
+                    .setItems(tempTracks){_,position ->
+                        Toast.makeText(this, audioTrack[position] + "Selected", Toast.LENGTH_SHORT).show()
+                        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredAudioLanguage(audioTrack[position]))
+                    }
+                    .create()
+                    .show()
+            }
         }
     }
 
@@ -164,10 +201,12 @@ class PlayerActivity : AppCompatActivity() {
 
         }
 
+        trackSelector = DefaultTrackSelector(this)
+
         binding.videoTitle.text = playerList[position].title
         binding.videoTitle.isSelected = true
 
-        player = ExoPlayer.Builder(this).build()
+        player = SimpleExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
         binding.playerView.player = player
 
 
@@ -187,6 +226,8 @@ class PlayerActivity : AppCompatActivity() {
 
         playInFullscreen(enable = isFullscreen)
         setVisibility()
+
+
     }
 
     private fun playVideo(){

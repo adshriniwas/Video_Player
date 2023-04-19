@@ -1,11 +1,13 @@
 package com.shriniwas.pawar.videoplayer
 
+import android.graphics.drawable.ColorDrawable
 import android.media.browse.MediaBrowser
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -17,9 +19,11 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
 import com.shriniwas.pawar.videoplayer.databinding.ActivityPlayerBinding
+import com.shriniwas.pawar.videoplayer.databinding.MoreFeaturesBinding
 
 class PlayerActivity : AppCompatActivity() {
 
@@ -138,6 +142,17 @@ class PlayerActivity : AppCompatActivity() {
                 binding.lockButton.setImageResource(R.drawable.lock_open_icon)
             }
 
+        }
+
+        binding.moreFeaturesBtn.setOnClickListener {
+            pauseVideo()
+            val customDialog = LayoutInflater.from(this).inflate(R.layout.more_features, binding.root, false)
+            val bindingMF = MoreFeaturesBinding.bind(customDialog)
+            val dialog = MaterialAlertDialogBuilder(this).setView(customDialog)
+                .setOnCancelListener { playVideo() }
+                .setBackground(ColorDrawable(0x803700B3.toInt()))
+                .create()
+            dialog.show()
         }
     }
 

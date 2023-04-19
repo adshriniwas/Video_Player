@@ -32,5 +32,12 @@
     <string name="fullscreen_button">Fullscreen Button</string>
     <string name="play_button">Play Button</string>
 
+    <string name="audio_track">Audio Track</string>
+    <string name="subtitles">Subtitles</string>
+    <string name="booster">Booster</string>
+    <string name="speed">Speed</string>
+    <string name="sleep_timer">Sleep Timer</string>
+    <string name="pip_mode">PIP Mode</string>
+
 
 </resources>

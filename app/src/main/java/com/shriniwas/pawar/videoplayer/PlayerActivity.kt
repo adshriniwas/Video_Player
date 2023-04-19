@@ -4,6 +4,9 @@ import android.media.browse.MediaBrowser
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.core.view.WindowCompat
@@ -21,6 +24,7 @@ import com.shriniwas.pawar.videoplayer.databinding.ActivityPlayerBinding
 class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
+    private lateinit var runnable: Runnable
 
     companion object {
         private lateinit var player: ExoPlayer
@@ -28,13 +32,15 @@ class PlayerActivity : AppCompatActivity() {
         var position: Int = -1
         private var repeat: Boolean = false
         private var isFullscreen: Boolean = false
+        private var isLocked: Boolean = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+            window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+
         }
         binding = ActivityPlayerBinding.inflate(layoutInflater)
 
@@ -42,10 +48,12 @@ class PlayerActivity : AppCompatActivity() {
         setTheme(R.style.playerActivityTheme)
         setContentView(binding.root)
         //        for immersive mode
-        WindowCompat.setDecorFitsSystemWindows(window,true)
+        WindowCompat.setDecorFitsSystemWindows(window,false)
+
         WindowInsetsControllerCompat(window, binding.root).let { controller ->
             controller.hide(WindowInsetsCompat.Type.statusBars())
 //            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_SWIPE
+            controller.hide(WindowInsetsCompat.Type.navigationBars())
 
         }
 
@@ -116,6 +124,21 @@ class PlayerActivity : AppCompatActivity() {
                 playInFullscreen(enable = true)
             }
         }
+
+        binding.lockButton.setOnClickListener {
+            if (!isLocked) {
+                isLocked = true
+                binding.playerView.hideController()
+                binding.playerView.useController = false
+                binding.lockButton.setImageResource(R.drawable.close_lock_icon)
+            } else {
+                isLocked = false
+                binding.playerView.useController = true
+                binding.playerView.showController()
+                binding.lockButton.setImageResource(R.drawable.lock_open_icon)
+            }
+
+        }
     }
 
     private fun createPlayer() {
@@ -148,6 +171,7 @@ class PlayerActivity : AppCompatActivity() {
         })
 
         playInFullscreen(enable = isFullscreen)
+        setVisibility()
     }
 
     private fun playVideo(){
@@ -203,6 +227,27 @@ class PlayerActivity : AppCompatActivity() {
             player.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT
             binding.fullScreenBtn.setImageResource(R.drawable.fullscreen_icon)
         }
+    }
+
+    private fun setVisibility() {
+        runnable = Runnable {
+            if (binding.playerView.isControllerVisible){
+                changeVisibility(View.VISIBLE)
+            }else {
+                changeVisibility(View.INVISIBLE)
+            }
+            Handler(Looper.getMainLooper()).postDelayed(runnable, 50)
+        }
+        Handler(Looper.getMainLooper()).postDelayed(runnable, 0)
+    }
+
+    private fun changeVisibility(visibility: Int) {
+        binding.topController.visibility = visibility
+        binding.bottomController.visibility = visibility
+        binding.playPauseBtn.visibility = visibility
+
+        if (isLocked) binding.lockButton.visibility = View.VISIBLE
+        else binding.lockButton.visibility = visibility
     }
 
     override fun onDestroy() {

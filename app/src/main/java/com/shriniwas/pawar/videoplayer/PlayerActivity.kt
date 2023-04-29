@@ -2,6 +2,7 @@ package com.shriniwas.pawar.videoplayer
 
 
 import android.graphics.drawable.ColorDrawable
+import android.media.audiofx.LoudnessEnhancer
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -23,7 +24,9 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shriniwas.pawar.videoplayer.databinding.ActivityPlayerBinding
+import com.shriniwas.pawar.videoplayer.databinding.BoosterBinding
 import com.shriniwas.pawar.videoplayer.databinding.MoreFeaturesBinding
+import com.shriniwas.pawar.videoplayer.databinding.SpeedDialogBinding
 import java.util.*
 
 
@@ -31,6 +34,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var runnable: Runnable
+    private var isSubtitle: Boolean = true
 
     companion object {
         private lateinit var player: SimpleExoPlayer
@@ -39,7 +43,8 @@ class PlayerActivity : AppCompatActivity() {
         private var repeat: Boolean = false
         private var isFullscreen: Boolean = false
         private var isLocked: Boolean = false
-        lateinit var trackSelector: DefaultTrackSelector
+        private lateinit var trackSelector: DefaultTrackSelector
+        private lateinit var loudnessEnhancer: LoudnessEnhancer
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -190,6 +195,59 @@ class PlayerActivity : AppCompatActivity() {
                     .create()
                     .show()
             }
+
+            bindingMF.subtitlesBtn.setOnClickListener {
+                if (isSubtitle) {
+                    trackSelector.parameters =  DefaultTrackSelector.ParametersBuilder(this)
+                        .setRendererDisabled(C.TRACK_TYPE_VIDEO, true).build()
+                    Toast.makeText(this,"Subtitles Off", Toast.LENGTH_SHORT).show()
+                    isSubtitle = false
+                }
+                else {
+                    trackSelector.parameters =  DefaultTrackSelector.ParametersBuilder(this)
+                        .setRendererDisabled(C.TRACK_TYPE_VIDEO, false).build()
+                    Toast.makeText(this, "Subtitles On", Toast.LENGTH_SHORT).show()
+                    isSubtitle = true
+                }
+                dialog.dismiss()
+                playVideo()
+            }
+            bindingMF.audioBoosterBtn.setOnClickListener {
+                dialog.dismiss()
+                val customDialogB = LayoutInflater.from(this).inflate(R.layout.booster, binding.root, false)
+                val bindingB = BoosterBinding.bind(customDialogB)
+                val dialogB = MaterialAlertDialogBuilder(this).setView(customDialogB)
+                    .setOnCancelListener { playVideo() }
+                    .setPositiveButton("OK"){self, _ ->
+                        loudnessEnhancer.setTargetGain(bindingB.verticalBoosterBar.progress *100)
+                        playVideo()
+                        self.dismiss()
+                    }
+                    .setBackground(ColorDrawable(0x803700B3.toInt()))
+                    .create()
+                dialogB.show()
+                bindingB.verticalBoosterBar.progress = loudnessEnhancer.targetGain.toInt()/100
+                bindingB.boosterProgressTxt.text = "Audio Boost\n\n${loudnessEnhancer.targetGain.toInt()/10} %"
+                bindingB.verticalBoosterBar.setOnProgressChangeListener {
+                    bindingB.boosterProgressTxt.text = "Audio Boost\n\n${it*10} %"
+                }
+            }
+
+            bindingMF.speedBtn.setOnClickListener {
+                dialog.dismiss()
+                val customDialogS = LayoutInflater.from(this).inflate(R.layout.speed_dialog, binding.root, false)
+                val bindingS = SpeedDialogBinding.bind(customDialogS)
+                val dialogS = MaterialAlertDialogBuilder(this).setView(customDialogS)
+                    .setCancelable(false)
+                    .setPositiveButton("OK"){self, _ ->
+
+                        playVideo()
+                        self.dismiss()
+                    }
+                    .setBackground(ColorDrawable(0x803700B3.toInt()))
+                    .create()
+                dialogS.show()
+            }
         }
     }
 
@@ -226,6 +284,8 @@ class PlayerActivity : AppCompatActivity() {
 
         playInFullscreen(enable = isFullscreen)
         setVisibility()
+        loudnessEnhancer = LoudnessEnhancer(player.audioSessionId)
+        loudnessEnhancer.enabled = true
 
 
     }

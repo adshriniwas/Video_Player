@@ -28,6 +28,7 @@
             app:iconTint="@color/white"/>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/subtitlesBtn"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             app:icon="@drawable/subtitles_icon"
@@ -43,6 +44,7 @@
             app:iconTint="@color/white"/>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/audioBoosterBtn"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             app:icon="@drawable/booster_icon"
@@ -64,6 +66,7 @@
         android:orientation="horizontal">
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/speedBtn"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             app:icon="@drawable/speed_icon"

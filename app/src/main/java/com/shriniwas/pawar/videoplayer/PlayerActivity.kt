@@ -27,6 +27,7 @@ import com.shriniwas.pawar.videoplayer.databinding.ActivityPlayerBinding
 import com.shriniwas.pawar.videoplayer.databinding.BoosterBinding
 import com.shriniwas.pawar.videoplayer.databinding.MoreFeaturesBinding
 import com.shriniwas.pawar.videoplayer.databinding.SpeedDialogBinding
+import java.text.DecimalFormat
 import java.util.*
 
 
@@ -45,6 +46,7 @@ class PlayerActivity : AppCompatActivity() {
         private var isLocked: Boolean = false
         private lateinit var trackSelector: DefaultTrackSelector
         private lateinit var loudnessEnhancer: LoudnessEnhancer
+        private var speed: Float = 1.0f
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -235,18 +237,27 @@ class PlayerActivity : AppCompatActivity() {
 
             bindingMF.speedBtn.setOnClickListener {
                 dialog.dismiss()
+                playVideo()
                 val customDialogS = LayoutInflater.from(this).inflate(R.layout.speed_dialog, binding.root, false)
                 val bindingS = SpeedDialogBinding.bind(customDialogS)
                 val dialogS = MaterialAlertDialogBuilder(this).setView(customDialogS)
                     .setCancelable(false)
                     .setPositiveButton("OK"){self, _ ->
 
-                        playVideo()
+
                         self.dismiss()
                     }
                     .setBackground(ColorDrawable(0x803700B3.toInt()))
                     .create()
                 dialogS.show()
+                bindingS.minusBtn.setOnClickListener{
+                    changeSpeed(false)
+                    bindingS.speedTxt.text = "${DecimalFormat("#.##").format(speed)} X"
+                }
+                bindingS.plusBtn.setOnClickListener{
+                    changeSpeed(true)
+                    bindingS.speedTxt.text = "${DecimalFormat("#.##").format(speed)} X"
+                }
             }
         }
     }
@@ -258,7 +269,7 @@ class PlayerActivity : AppCompatActivity() {
         }catch (e: Exception){
 
         }
-
+        speed = 1.0f
         trackSelector = DefaultTrackSelector(this)
 
         binding.videoTitle.text = playerList[position].title
@@ -364,6 +375,20 @@ class PlayerActivity : AppCompatActivity() {
 
         if (isLocked) binding.lockButton.visibility = View.VISIBLE
         else binding.lockButton.visibility = visibility
+    }
+
+    private fun changeSpeed(isIncrement: Boolean){
+        if (isIncrement){
+            if (speed <= 2.9f){
+                speed += 0.10f
+            }
+        }
+        else{
+            if (speed > 0.20){
+                speed -= 0.10f
+            }
+        }
+        player.setPlaybackSpeed(speed)
     }
 
     override fun onDestroy() {

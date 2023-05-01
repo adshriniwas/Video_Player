@@ -1,5 +1,6 @@
 package com.shriniwas.pawar.videoplayer
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.shriniwas.pawar.videoplayer.databinding.VideoViewBinding
+
 
 class VideoAdapter(private val context: Context, private var videoList: ArrayList<Video>, private val isFolder: Boolean = false) : RecyclerView.Adapter<VideoAdapter.MyHolder>(){
     class MyHolder(binding: VideoViewBinding): RecyclerView.ViewHolder(binding.root) {
@@ -36,9 +38,11 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         holder.root.setOnClickListener {
             when{
                 isFolder -> {
+                    PlayerActivity.pipStatus = 1
                     sendIntent(pos = position, ref = "FolderActivity")
                 }
                 else -> {
+                    PlayerActivity.pipStatus = 2
                     sendIntent(pos = position, ref = "AllVideos")
                 }
             }

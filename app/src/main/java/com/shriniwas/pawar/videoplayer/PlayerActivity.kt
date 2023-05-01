@@ -1,8 +1,14 @@
 package com.shriniwas.pawar.videoplayer
 
 
+import android.app.AppOpsManager
+import android.app.PictureInPictureParams
+import android.content.Context
+import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
 import android.media.audiofx.LoudnessEnhancer
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -16,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -49,6 +56,7 @@ class PlayerActivity : AppCompatActivity() {
         private lateinit var loudnessEnhancer: LoudnessEnhancer
         private var speed: Float = 1.0f
         private var timer: Timer? = null
+        var pipStatus: Int = 0
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +83,7 @@ class PlayerActivity : AppCompatActivity() {
 
         initializeLayout()
         initializeBinding()
+
 
     }
 
@@ -304,6 +313,36 @@ class PlayerActivity : AppCompatActivity() {
 
             }
 
+            bindingMF.pipModeBtn.setOnClickListener {
+                val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+                val status = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    appOps.checkOpNoThrow(AppOpsManager.OPSTR_PICTURE_IN_PICTURE, android.os.Process.myUid(), packageName) == AppOpsManager.MODE_ALLOWED
+                } else {
+                    false
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                    if (status) {
+
+                        this.enterPictureInPictureMode(PictureInPictureParams.Builder().build())
+
+                        dialog.dismiss()
+                            binding.playerView.hideController()
+                            playVideo()
+                            pipStatus = 0
+
+
+                    }else {
+                        val intent = Intent("android.settings.PICTURE_IN_PICTURE_SETTINGS",
+                            Uri.parse("package:$packageName"))
+                        startActivity(intent)
+                    }
+                }else {
+                    Toast.makeText(this, "PIP Mode Feature Not Supported!!", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                    playVideo()
+                }
+            }
+
 
         }
     }
@@ -436,6 +475,53 @@ class PlayerActivity : AppCompatActivity() {
         }
         player.setPlaybackSpeed(speed)
     }
+
+
+
+
+
+
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        }
+
+
+        if (getLifecycle().getCurrentState() == Lifecycle.State.CREATED) {
+            //when user click on Close button of PIP this will trigger.
+            finishAndRemoveTask();
+
+        }
+        else if (getLifecycle().getCurrentState() == Lifecycle.State.STARTED){
+            //when PIP maximize this will trigger
+        }
+
+        if (!isInPictureInPictureMode) {
+            if (pipStatus != 0) {
+
+
+                moveTaskToBack(false /* nonRoot */);
+                finish()
+                val intent = Intent(this, PlayerActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
+                when (pipStatus) {
+                    1 -> {
+                        intent.putExtra("class", "FolderActivity")
+                    }
+                    2 -> {
+                        intent.putExtra("class", "AllVideos")
+                    }
+                }
+                startActivity(intent)
+
+            }
+        }
+    }
+
+
 
     override fun onDestroy() {
         super.onDestroy()

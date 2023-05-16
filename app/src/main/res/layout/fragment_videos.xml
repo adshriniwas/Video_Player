@@ -43,8 +43,8 @@
         android:backgroundTint="@color/white"
         app:icon="@drawable/play_icon"
         app:strokeWidth="2dp"
-        app:strokeColor="@color/cool_pink"
-        app:iconTint="@color/cool_pink"
+        app:strokeColor="?attr/themeColor"
+        app:iconTint="?attr/themeColor"
         app:iconSize="35dp"
         android:visibility="invisible"/>
 

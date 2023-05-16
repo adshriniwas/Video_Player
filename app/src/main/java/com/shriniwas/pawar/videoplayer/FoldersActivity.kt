@@ -20,7 +20,7 @@ class FoldersActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityFoldersBinding.inflate(layoutInflater)
-        setTheme(R.style.coolPinkNav)
+        setTheme(MainActivity.themesList[MainActivity.themeIndex])
         setContentView(binding.root)
 
 

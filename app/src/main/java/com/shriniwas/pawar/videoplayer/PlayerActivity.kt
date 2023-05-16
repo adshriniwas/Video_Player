@@ -44,6 +44,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var runnable: Runnable
     private var isSubtitle: Boolean = true
+    private var moreTime: Int = 0
 
     companion object {
         private lateinit var player: SimpleExoPlayer
@@ -84,6 +85,23 @@ class PlayerActivity : AppCompatActivity() {
         initializeLayout()
         initializeBinding()
 
+        binding.forwardFL.setOnClickListener(DoubleClickListener(callback = object : DoubleClickListener.Callback{
+            override fun doubleClicked() {
+                binding.playerView.showController()
+                binding.forwardBtn.visibility = View.VISIBLE
+                player.seekTo(player.currentPosition + 10000)
+                moreTime = 0
+            }
+        }))
+
+        binding.rewindFL.setOnClickListener(DoubleClickListener(callback = object : DoubleClickListener.Callback{
+            override fun doubleClicked() {
+                binding.playerView.showController()
+                binding.rewindBtn.visibility = View.VISIBLE
+                player.seekTo(player.currentPosition - 10000)
+                moreTime = 0
+            }
+        }))
 
     }
 
@@ -460,17 +478,28 @@ class PlayerActivity : AppCompatActivity() {
 
         if (isLocked) binding.lockButton.visibility = View.VISIBLE
         else binding.lockButton.visibility = visibility
+
+        if (moreTime == 2){
+            binding.rewindBtn.visibility = View.GONE
+            binding.forwardBtn.visibility = View.GONE
+        }else{
+            ++moreTime
+        }
+
+        binding.rewindFL.visibility = visibility
+        binding.forwardFL.visibility = visibility
+
     }
 
     private fun changeSpeed(isIncrement: Boolean){
         if (isIncrement){
             if (speed <= 2.9f){
-                speed += 0.10f
+                speed += 0.25f
             }
         }
         else{
-            if (speed > 0.20){
-                speed -= 0.10f
+            if (speed > 0.25){
+                speed -= 0.25f
             }
         }
         player.setPlaybackSpeed(speed)

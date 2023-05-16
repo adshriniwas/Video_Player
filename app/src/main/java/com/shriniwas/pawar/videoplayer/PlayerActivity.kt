@@ -58,6 +58,7 @@ class PlayerActivity : AppCompatActivity() {
         private var speed: Float = 1.0f
         private var timer: Timer? = null
         var pipStatus: Int = 0
+        var nowPlayingId: String = ""
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,7 +118,20 @@ class PlayerActivity : AppCompatActivity() {
                 playerList.addAll(FoldersActivity.currentFolderVideos)
                 createPlayer()
             }
-
+            "SearchedVideos" -> {
+                playerList = ArrayList()
+                playerList.addAll(MainActivity.searchList)
+                createPlayer()
+            }
+            "NowPlaying" -> {
+                speed = 1.0f
+                binding.videoTitle.text = playerList[position].title
+                binding.videoTitle.isSelected = true
+                binding.playerView.player = player
+                playVideo()
+                playInFullscreen(enable = isFullscreen)
+                setVisibility()
+            }
         }
 
         if (repeat) binding.repeatBtn.setImageResource(com.google.android.exoplayer2.ui.R.drawable.exo_controls_repeat_all)
@@ -400,7 +414,7 @@ class PlayerActivity : AppCompatActivity() {
         setVisibility()
         loudnessEnhancer = LoudnessEnhancer(player.audioSessionId)
         loudnessEnhancer.enabled = true
-
+        nowPlayingId = playerList[position].id
 
     }
 
@@ -541,8 +555,12 @@ class PlayerActivity : AppCompatActivity() {
                         intent.putExtra("class", "FolderActivity")
                     }
                     2 -> {
+                        intent.putExtra("class", "SearchedVideos")
+                    }
+                    3 -> {
                         intent.putExtra("class", "AllVideos")
                     }
+
                 }
                 startActivity(intent)
 
@@ -554,6 +572,6 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        player.release()
+        player.pause()
     }
 }

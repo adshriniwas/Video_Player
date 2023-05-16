@@ -1,11 +1,13 @@
 package com.shriniwas.pawar.videoplayer
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
+import android.view.*
+import android.widget.Toast
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.shriniwas.pawar.videoplayer.databinding.FragmentVideosBinding
 
@@ -13,12 +15,13 @@ import com.shriniwas.pawar.videoplayer.databinding.FragmentVideosBinding
 class VideosFragment : Fragment() {
 
 
+    private lateinit var adapter: VideoAdapter
+    private lateinit var binding: FragmentVideosBinding
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-
-        }
+        setHasOptionsMenu(true)
     }
 
     @SuppressLint("SetTextI18n")
@@ -26,17 +29,53 @@ class VideosFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_videos, container, false)
 
-        val binding = FragmentVideosBinding.bind(view)
+        binding = FragmentVideosBinding.bind(view)
 
 
         binding.videoRV.setHasFixedSize(true)
         binding.videoRV.setItemViewCacheSize(10)
 
         binding.videoRV.layoutManager = LinearLayoutManager(requireContext())
-        binding.videoRV.adapter = VideoAdapter(requireContext(), MainActivity.videoList)
+        adapter = VideoAdapter(requireContext(), MainActivity.videoList)
+        binding.videoRV.adapter = adapter
         binding.totalVideos.text = "Total Videos: ${MainActivity.videoList.size}"
+        binding.nowPlayingBtn.setOnClickListener{
+            val intent = Intent(requireContext(), PlayerActivity::class.java)
+            intent.putExtra("class", "NowPlaying")
+            startActivity(intent)
+        }
         return view
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.search_view, menu)
+        val searchView = menu.findItem(R.id.searchView)?.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean = true
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText != null){
+                    MainActivity.searchList = ArrayList()
+                    for (video in MainActivity.videoList){
+                        if (video.title.lowercase().contains(newText.lowercase())){
+                            MainActivity.searchList.add(video)
+                        }
+                    }
+                    MainActivity.search = true
+                    adapter.updateList(searchList = MainActivity.searchList)
+
+                }
+                return true
+            }
+        })
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (PlayerActivity.position != -1){
+            binding.nowPlayingBtn.visibility = View.VISIBLE
+        }
+    }
 
 }

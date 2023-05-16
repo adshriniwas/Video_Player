@@ -1,5 +1,6 @@
 package com.shriniwas.pawar.videoplayer
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -37,12 +38,19 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             .into(holder.image)
         holder.root.setOnClickListener {
             when{
+                videoList[position].id == PlayerActivity.nowPlayingId -> {
+                    sendIntent(pos = position, ref = "NowPlaying")
+                }
                 isFolder -> {
                     PlayerActivity.pipStatus = 1
                     sendIntent(pos = position, ref = "FolderActivity")
                 }
-                else -> {
+                MainActivity.search -> {
                     PlayerActivity.pipStatus = 2
+                    sendIntent(pos = position, ref = "SearchedVideos")
+                }
+                else -> {
+                    PlayerActivity.pipStatus = 3
                     sendIntent(pos = position, ref = "AllVideos")
                 }
             }
@@ -59,5 +67,12 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         val intent = Intent(context, PlayerActivity::class.java)
         intent.putExtra("class", ref)
         ContextCompat.startActivity(context, intent, null)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateList(searchList: ArrayList<Video>){
+        videoList = ArrayList()
+        videoList.addAll(searchList)
+        notifyDataSetChanged()
     }
 }

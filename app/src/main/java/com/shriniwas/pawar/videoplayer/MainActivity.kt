@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                     bindingTV.themeRed.setOnClickListener { saveTheme(4) }
                     bindingTV.themeBlack.setOnClickListener { saveTheme(5) }
                 }
-                R.id.sortOrderNav -> Toast.makeText(this, "sort order", Toast.LENGTH_SHORT).show()
+//                R.id.sortOrderNav -> Toast.makeText(this, "sort order", Toast.LENGTH_SHORT).show()
                 R.id.aboutNav -> startActivity(Intent(this, AboutActivity::class.java))
                 R.id.exitNav -> exitProcess(1)
             }

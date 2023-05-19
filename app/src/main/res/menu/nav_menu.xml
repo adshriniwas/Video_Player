@@ -10,11 +10,11 @@
         android:title="@string/themes"
         android:icon="@drawable/theme_icon"
         />
-    <item
-        android:id="@+id/sortOrderNav"
-        android:title="@string/sort_order"
-        android:icon="@drawable/sort_order_icon"
-        />
+<!--    <item-->
+<!--        android:id="@+id/sortOrderNav"-->
+<!--        android:title="@string/sort_order"-->
+<!--        android:icon="@drawable/sort_order_icon"-->
+<!--        />-->
     <item
         android:id="@+id/aboutNav"
         android:title="@string/about"

@@ -1,10 +1,12 @@
 package com.shriniwas.pawar.videoplayer
 
 
+import android.annotation.SuppressLint
 import android.app.AppOpsManager
 import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
 import android.media.audiofx.LoudnessEnhancer
@@ -139,8 +141,16 @@ class PlayerActivity : AppCompatActivity() {
 
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     private fun initializeBinding() {
 
+        binding.orientationBtn.setOnClickListener {
+            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            }else{
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            }
+        }
 
 
         binding.backBtn.setOnClickListener {

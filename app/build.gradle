@@ -53,4 +53,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     implementation 'com.github.vkay94:DoubleTapPlayerView:1.0.4'
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 }

@@ -25,6 +25,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
+import com.github.vkay94.dtpv.youtube.YouTubeOverlay
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -88,23 +89,7 @@ class PlayerActivity : AppCompatActivity() {
         initializeLayout()
         initializeBinding()
 
-        binding.forwardFL.setOnClickListener(DoubleClickListener(callback = object : DoubleClickListener.Callback{
-            override fun doubleClicked() {
-                binding.playerView.showController()
-                binding.forwardBtn.visibility = View.VISIBLE
-                player.seekTo(player.currentPosition + 10000)
-                moreTime = 0
-            }
-        }))
 
-        binding.rewindFL.setOnClickListener(DoubleClickListener(callback = object : DoubleClickListener.Callback{
-            override fun doubleClicked() {
-                binding.playerView.showController()
-                binding.rewindBtn.visibility = View.VISIBLE
-                player.seekTo(player.currentPosition - 10000)
-                moreTime = 0
-            }
-        }))
 
     }
 
@@ -129,7 +114,7 @@ class PlayerActivity : AppCompatActivity() {
                 speed = 1.0f
                 binding.videoTitle.text = playerList[position].title
                 binding.videoTitle.isSelected = true
-                binding.playerView.player = player
+                doubleTapEnable()
                 playVideo()
                 playInFullscreen(enable = isFullscreen)
                 setVisibility()
@@ -403,7 +388,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.videoTitle.isSelected = true
 
         player = SimpleExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
-        binding.playerView.player = player
+        doubleTapEnable()
 
 
         val mediaItem = MediaItem.fromUri(playerList[position].artUri)
@@ -504,14 +489,12 @@ class PlayerActivity : AppCompatActivity() {
         else binding.lockButton.visibility = visibility
 
         if (moreTime == 2){
-            binding.rewindBtn.visibility = View.GONE
-            binding.forwardBtn.visibility = View.GONE
+
         }else{
-            ++moreTime
+
         }
 
-        binding.rewindFL.visibility = visibility
-        binding.forwardFL.visibility = visibility
+
 
     }
 
@@ -583,5 +566,20 @@ class PlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         player.pause()
+    }
+
+    private fun doubleTapEnable(){
+        binding.playerView.player = player
+        binding.ytOverlay.performListener(object: YouTubeOverlay.PerformListener{
+            override fun onAnimationEnd() {
+                binding.ytOverlay.visibility = View.GONE
+            }
+
+            override fun onAnimationStart() {
+                binding.ytOverlay.visibility = View.VISIBLE
+            }
+
+        })
+        binding.ytOverlay.player(player)
     }
 }

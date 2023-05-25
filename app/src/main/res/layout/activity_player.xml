@@ -7,13 +7,37 @@
     android:background="@color/black"
     tools:context=".PlayerActivity">
 
-    <com.google.android.exoplayer2.ui.PlayerView
-        android:id="@+id/playerView"
+<!--    <com.google.android.exoplayer2.ui.PlayerView-->
+<!--        android:id="@+id/playerView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:keepScreenOn="true"-->
+<!--        app:controller_layout_id="@layout/custom_control_view"-->
+<!--        app:show_buffering="always"/>-->
 
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:keepScreenOn="true"
-        app:controller_layout_id="@layout/custom_control_view"/>
+        android:layout_height="match_parent">
+
+        <com.github.vkay94.dtpv.DoubleTapPlayerView
+            android:id="@+id/playerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:keepScreenOn="true"
+            app:controller_layout_id="@layout/custom_control_view"
+            android:background="@color/black"
+            app:dtpv_controller="@id/ytOverlay"
+            app:show_buffering="always"/>
+
+        <com.github.vkay94.dtpv.youtube.YouTubeOverlay
+            android:id="@+id/ytOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:yt_playerView="@id/playerView"
+            android:background="#77000000"
+            android:visibility="invisible"
+            />
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/topController"
@@ -71,36 +95,8 @@
         app:layout_constraintEnd_toEndOf="@id/topController"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:orientation="horizontal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:gravity="center">
 
-        <FrameLayout
-            android:id="@+id/rewindFL"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            >
 
-            <ImageButton
-                android:id="@+id/rewindBtn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/rewind_icon"
-                android:contentDescription="@string/play_button"
-                app:tint="@color/white"
-                android:background="@android:color/transparent"
-                android:clickable="false"
-                android:visibility="gone"
-                android:layout_gravity="center"
-                />
-        </FrameLayout>
 
         <ImageButton
             android:id="@+id/playPauseBtn"
@@ -111,29 +107,14 @@
             app:tint="@color/white"
             android:clickable="true"
             android:focusable="true"
-            android:background="?android:selectableItemBackground"/>
+            android:background="?android:selectableItemBackground"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-        <FrameLayout
-            android:id="@+id/forwardFL"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            >
 
-            <ImageButton
-                android:id="@+id/forwardBtn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/forward_icon"
-                android:contentDescription="@string/play_button"
-                app:tint="@color/white"
-                android:background="@android:color/transparent"
-                android:clickable="false"
-                android:visibility="gone"
-                android:layout_gravity="center"
-                />
-        </FrameLayout>
-    </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/bottomController"

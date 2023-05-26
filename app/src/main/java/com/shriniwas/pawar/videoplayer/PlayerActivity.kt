@@ -183,11 +183,13 @@ class PlayerActivity : AppCompatActivity() {
         binding.lockButton.setOnClickListener {
             if (!isLocked) {
                 isLocked = true
+                binding.playerView.isDoubleTapEnabled = false
                 binding.playerView.hideController()
                 binding.playerView.useController = false
                 binding.lockButton.setImageResource(R.drawable.close_lock_icon)
             } else {
                 isLocked = false
+                binding.playerView.isDoubleTapEnabled = true
                 binding.playerView.useController = true
                 binding.playerView.showController()
                 binding.lockButton.setImageResource(R.drawable.lock_open_icon)

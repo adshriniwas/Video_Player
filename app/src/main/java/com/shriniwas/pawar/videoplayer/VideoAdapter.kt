@@ -91,10 +91,27 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                             val newFile = File(currentFile.parentFile, newName.toString()+"."+currentFile.extension)
                             if (currentFile.renameTo(newFile)){
                                 MediaScannerConnection.scanFile(context, arrayOf(newFile.toString()), arrayOf("video/*"), null)
-                                MainActivity.videoList[position].title = newName.toString()
-                                MainActivity.videoList[position].path = newFile.path
-                                MainActivity.videoList[position].artUri = Uri.fromFile(newFile)
-                                notifyItemChanged(position)
+                                when{
+                                    MainActivity.search -> {
+                                        MainActivity.searchList[position].title = newName.toString()
+                                        MainActivity.searchList[position].path = newFile.path
+                                        MainActivity.searchList[position].artUri = Uri.fromFile(newFile)
+                                        notifyItemChanged(position)
+                                    }
+                                    isFolder -> {
+                                        FoldersActivity.currentFolderVideos[position].title = newName.toString()
+                                        FoldersActivity.currentFolderVideos[position].path = newFile.path
+                                        FoldersActivity.currentFolderVideos[position].artUri = Uri.fromFile(newFile)
+                                        notifyItemChanged(position)
+                                        MainActivity.dataChanged = true
+                                    }
+                                    else -> {
+                                        MainActivity.videoList[position].title = newName.toString()
+                                        MainActivity.videoList[position].path = newFile.path
+                                        MainActivity.videoList[position].artUri = Uri.fromFile(newFile)
+                                        notifyItemChanged(position)
+                                    }
+                                }
                             }
                             else{
                                 Toast.makeText(context, "Permission Denied!!", Toast.LENGTH_SHORT).show()

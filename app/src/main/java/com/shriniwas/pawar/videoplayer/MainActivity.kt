@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         var search: Boolean = false
         var themeIndex: Int = 0
         val themesList = arrayOf(R.style.coolPinkNav, R.style.coolBlueNav, R.style.coolPurpleNav, R.style.coolGreenNav, R.style.coolRedNav, R.style.coolBlackNav)
+        var dataChanged:Boolean = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +63,7 @@ class MainActivity : AppCompatActivity() {
         setFragment(VideosFragment())
 
         binding.bottomNav.setOnItemSelectedListener {
+            if (dataChanged) videoList = getAllVideos(this)
             when(it.itemId){
                 R.id.videoView -> setFragment(VideosFragment())
                 R.id.foldersView -> setFragment(FoldersFragment())

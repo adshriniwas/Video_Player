@@ -42,4 +42,12 @@
     <string name="search">Search</string>
     <string name="orientation">Orientation</string>
 
+    <!--strings for video more features-->
+    <string name="rename">Rename </string>
+    <string name="delete">Delete</string>
+    <string name="info">Info</string>
+    <string name="share">Share</string>
+    <string name="O">0</string>
+    <string name="apply_to_all">Apply To All Upcoming Videos</string>
+
 </resources>

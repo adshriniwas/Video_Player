@@ -55,7 +55,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
         return MyHolder(VideoViewBinding.inflate(LayoutInflater.from(context), parent, false))
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation")
     override fun onBindViewHolder(holder: VideoAdapter.MyHolder, position: Int) {
         holder.title.text = videoList[position].title
         holder.folder.text = videoList[position].folderName
@@ -65,34 +65,82 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
             .load(videoList[position].artUri)
             .apply(RequestOptions().placeholder(R.mipmap.ic_video_player).centerCrop())
             .into(holder.image)
+
         holder.root.setOnClickListener {
 
-            val dialogDF = MaterialAlertDialogBuilder(context)
-                .setTitle("Do you want to play Video?")
-                .setPositiveButton("Resume"){self, _ ->
-                    var adRequest = AdRequest.Builder().build()
+            if(videoList[position].id == PlayerActivity.nowPlayingId) {
+                val dialogDF = MaterialAlertDialogBuilder(context)
+                    .setTitle("Do you want to play Video?")
+                    .setPositiveButton("Resume") { self, _ ->
+                        var adRequest = AdRequest.Builder().build()
 
-                    InterstitialAd.load(context,"ca-app-pub-3940256099942544/1033173712", adRequest, object : InterstitialAdLoadCallback() {
-                        override fun onAdFailedToLoad(adError: LoadAdError) {
-                            mInterstitialAd = null
-                        }
+                        InterstitialAd.load(
+                            context,
+                            "ca-app-pub-3940256099942544/1033173712",
+                            adRequest,
+                            object : InterstitialAdLoadCallback() {
+                                override fun onAdFailedToLoad(adError: LoadAdError) {
+                                    mInterstitialAd = null
+                                }
 
-                        override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                            mInterstitialAd = interstitialAd
-                        }
-                    })
+                                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                                    mInterstitialAd = interstitialAd
+                                }
+                            })
 
-                    mInterstitialAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
-                        override fun onAdClicked() {
-                            // Called when a click is recorded for an ad.
-                            Log.d("soccer", "Ad was clicked.")
-                        }
+                        mInterstitialAd?.fullScreenContentCallback =
+                            object : FullScreenContentCallback() {
+                                override fun onAdClicked() {
+                                    // Called when a click is recorded for an ad.
+                                    Log.d("soccer", "Ad was clicked.")
+                                }
 
-                        override fun onAdDismissedFullScreenContent() {
-                            // Called when ad is dismissed.
-                            Log.d("soccer", "Ad dismissed fullscreen content.")
-                            mInterstitialAd = null
-                            when{
+                                override fun onAdDismissedFullScreenContent() {
+                                    // Called when ad is dismissed.
+                                    Log.d("soccer", "Ad dismissed fullscreen content.")
+                                    mInterstitialAd = null
+                                    when {
+                                        videoList[position].id == PlayerActivity.nowPlayingId -> {
+                                            sendIntent(pos = position, ref = "NowPlaying")
+                                        }
+                                        isFolder -> {
+                                            PlayerActivity.pipStatus = 1
+                                            sendIntent(pos = position, ref = "FolderActivity")
+                                        }
+                                        MainActivity.search -> {
+                                            PlayerActivity.pipStatus = 2
+                                            sendIntent(pos = position, ref = "SearchedVideos")
+                                        }
+                                        else -> {
+                                            PlayerActivity.pipStatus = 3
+                                            sendIntent(pos = position, ref = "AllVideos")
+                                        }
+                                    }
+
+                                }
+
+                                override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                                    // Called when ad fails to show.
+                                    Log.e("soccer", "Ad failed to show fullscreen content.")
+                                    mInterstitialAd = null
+                                }
+
+                                override fun onAdImpression() {
+                                    // Called when an impression is recorded for an ad.
+                                    Log.d("soccer", "Ad recorded an impression.")
+                                }
+
+                                override fun onAdShowedFullScreenContent() {
+                                    // Called when ad is shown.
+                                    Log.d("soccer", "Ad showed fullscreen content.")
+                                }
+                            }
+
+                        if (mInterstitialAd != null) {
+                            mInterstitialAd?.show(context as Activity)
+                        } else {
+                            Log.d("TAG", "The interstitial ad wasn't ready yet.")
+                            when {
                                 videoList[position].id == PlayerActivity.nowPlayingId -> {
                                     sendIntent(pos = position, ref = "NowPlaying")
                                 }
@@ -109,53 +157,112 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                                     sendIntent(pos = position, ref = "AllVideos")
                                 }
                             }
-
-                        }
-
-                        override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-                            // Called when ad fails to show.
-                            Log.e("soccer", "Ad failed to show fullscreen content.")
-                            mInterstitialAd = null
-                        }
-
-                        override fun onAdImpression() {
-                            // Called when an impression is recorded for an ad.
-                            Log.d("soccer", "Ad recorded an impression.")
-                        }
-
-                        override fun onAdShowedFullScreenContent() {
-                            // Called when ad is shown.
-                            Log.d("soccer", "Ad showed fullscreen content.")
                         }
                     }
+                    .setNegativeButton("Play From Begining") { self, _ ->
+                        var adRequest = AdRequest.Builder().build()
 
-                    if (mInterstitialAd != null) {
-                        mInterstitialAd?.show(context as Activity)
-                    } else {
-                        Log.d("TAG", "The interstitial ad wasn't ready yet.")
-                        when{
-                            videoList[position].id == PlayerActivity.nowPlayingId -> {
-                                sendIntent(pos = position, ref = "NowPlaying")
+                        InterstitialAd.load(
+                            context,
+                            "ca-app-pub-3940256099942544/1033173712",
+                            adRequest,
+                            object : InterstitialAdLoadCallback() {
+                                override fun onAdFailedToLoad(adError: LoadAdError) {
+
+                                    mInterstitialAd = null
+                                }
+
+                                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+
+                                    mInterstitialAd = interstitialAd
+                                }
+                            })
+
+                        mInterstitialAd?.fullScreenContentCallback =
+                            object : FullScreenContentCallback() {
+                                override fun onAdClicked() {
+                                    // Called when a click is recorded for an ad.
+                                    Log.d("soccer", "Ad was clicked.")
+                                }
+
+                                override fun onAdDismissedFullScreenContent() {
+                                    // Called when ad is dismissed.
+                                    Log.d("soccer", "Ad dismissed fullscreen content.")
+                                    mInterstitialAd = null
+                                    when {
+                                        isFolder -> {
+                                            PlayerActivity.pipStatus = 1
+                                            sendIntent(pos = position, ref = "FolderActivity")
+                                        }
+                                        MainActivity.search -> {
+                                            PlayerActivity.pipStatus = 2
+                                            sendIntent(pos = position, ref = "SearchedVideos")
+                                        }
+                                        else -> {
+                                            PlayerActivity.pipStatus = 3
+                                            sendIntent(pos = position, ref = "AllVideos")
+                                        }
+                                    }
+
+                                }
+
+                                override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                                    // Called when ad fails to show.
+                                    Log.e("soccer", "Ad failed to show fullscreen content.")
+                                    mInterstitialAd = null
+
+
+                                }
+
+                                override fun onAdImpression() {
+                                    // Called when an impression is recorded for an ad.
+                                    Log.d("soccer", "Ad recorded an impression.")
+                                }
+
+                                override fun onAdShowedFullScreenContent() {
+                                    // Called when ad is shown.
+                                    Log.d("soccer", "Ad showed fullscreen content.")
+                                }
                             }
-                            isFolder -> {
-                                PlayerActivity.pipStatus = 1
-                                sendIntent(pos = position, ref = "FolderActivity")
-                            }
-                            MainActivity.search -> {
-                                PlayerActivity.pipStatus = 2
-                                sendIntent(pos = position, ref = "SearchedVideos")
-                            }
-                            else -> {
-                                PlayerActivity.pipStatus = 3
-                                sendIntent(pos = position, ref = "AllVideos")
+
+
+                        if (mInterstitialAd != null) {
+                            mInterstitialAd?.show(context as Activity)
+                        } else {
+                            Log.d("TAG", "The interstitial ad wasn't ready yet.")
+                            when {
+                                isFolder -> {
+                                    PlayerActivity.pipStatus = 1
+                                    sendIntent(pos = position, ref = "FolderActivity")
+                                }
+                                MainActivity.search -> {
+                                    PlayerActivity.pipStatus = 2
+                                    sendIntent(pos = position, ref = "SearchedVideos")
+                                }
+                                else -> {
+                                    PlayerActivity.pipStatus = 3
+                                    sendIntent(pos = position, ref = "AllVideos")
+                                }
                             }
                         }
-                    }
-                }
-                .setNegativeButton("Play From Begining"){self, _ ->
-                    var adRequest = AdRequest.Builder().build()
+                    }.create()
+                dialogDF.show()
+                dialogDF.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(
+                    MaterialColors.getColor(context, R.attr.themeColor, Color.RED)
+                )
+                dialogDF.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundColor(
+                    MaterialColors.getColor(context, R.attr.themeColor, Color.RED)
+                )
+            }else {
 
-                    InterstitialAd.load(context,"ca-app-pub-3940256099942544/1033173712", adRequest, object : InterstitialAdLoadCallback() {
+//                It doesnt show dialogue for unresumed video
+                var adRequest = AdRequest.Builder().build()
+
+                InterstitialAd.load(
+                    context,
+                    "ca-app-pub-3940256099942544/1033173712",
+                    adRequest,
+                    object : InterstitialAdLoadCallback() {
                         override fun onAdFailedToLoad(adError: LoadAdError) {
 
                             mInterstitialAd = null
@@ -167,7 +274,8 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                         }
                     })
 
-                    mInterstitialAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
+                mInterstitialAd?.fullScreenContentCallback =
+                    object : FullScreenContentCallback() {
                         override fun onAdClicked() {
                             // Called when a click is recorded for an ad.
                             Log.d("soccer", "Ad was clicked.")
@@ -177,7 +285,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                             // Called when ad is dismissed.
                             Log.d("soccer", "Ad dismissed fullscreen content.")
                             mInterstitialAd = null
-                            when{
+                            when {
                                 isFolder -> {
                                     PlayerActivity.pipStatus = 1
                                     sendIntent(pos = position, ref = "FolderActivity")
@@ -214,34 +322,26 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                     }
 
 
-                    if (mInterstitialAd != null) {
-                        mInterstitialAd?.show(context as Activity)
-                    } else {
-                        Log.d("TAG", "The interstitial ad wasn't ready yet.")
-                        when{
-                            isFolder -> {
-                                PlayerActivity.pipStatus = 1
-                                sendIntent(pos = position, ref = "FolderActivity")
-                            }
-                            MainActivity.search -> {
-                                PlayerActivity.pipStatus = 2
-                                sendIntent(pos = position, ref = "SearchedVideos")
-                            }
-                            else -> {
-                                PlayerActivity.pipStatus = 3
-                                sendIntent(pos = position, ref = "AllVideos")
-                            }
+                if (mInterstitialAd != null) {
+                    mInterstitialAd?.show(context as Activity)
+                } else {
+                    Log.d("TAG", "The interstitial ad wasn't ready yet.")
+                    when {
+                        isFolder -> {
+                            PlayerActivity.pipStatus = 1
+                            sendIntent(pos = position, ref = "FolderActivity")
+                        }
+                        MainActivity.search -> {
+                            PlayerActivity.pipStatus = 2
+                            sendIntent(pos = position, ref = "SearchedVideos")
+                        }
+                        else -> {
+                            PlayerActivity.pipStatus = 3
+                            sendIntent(pos = position, ref = "AllVideos")
                         }
                     }
-                }.create()
-                dialogDF.show()
-                dialogDF.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(
-                    MaterialColors.getColor(context, R.attr.themeColor, Color.RED)
-                )
-                dialogDF.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundColor(
-                    MaterialColors.getColor(context, R.attr.themeColor, Color.RED)
-                )
-
+                }
+            }
 
 
 

@@ -6,11 +6,18 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.MenuItem
+import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.shriniwas.pawar.videoplayer.databinding.ActivityFoldersBinding
 import java.io.File
 
 class FoldersActivity : AppCompatActivity() {
+
+    private lateinit var checkNetworkConnection: CheckNetworkConnection
 
     companion object {
         lateinit var currentFolderVideos: ArrayList<Video>
@@ -23,7 +30,7 @@ class FoldersActivity : AppCompatActivity() {
         setTheme(MainActivity.themesList[MainActivity.themeIndex])
         setContentView(binding.root)
 
-
+        callNetworkConnection()
 
         val position = intent.getIntExtra("position", 0)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -100,5 +107,25 @@ class FoldersActivity : AppCompatActivity() {
         }
 
         return tempList
+    }
+
+    fun loadBannerAds() {
+        MobileAds.initialize(this@FoldersActivity)
+        val adRequest: AdRequest = AdRequest.Builder().build()
+        this@FoldersActivity.findViewById<AdView>(R.id.adView2).loadAd(adRequest)
+    }
+
+    private fun callNetworkConnection() {
+        checkNetworkConnection = CheckNetworkConnection(application)
+        checkNetworkConnection.observe(this) { isConnected ->
+            if (isConnected) {
+                this@FoldersActivity.findViewById<AdView>(R.id.adView2).visibility = View.VISIBLE
+                loadBannerAds()
+            } else {
+                this@FoldersActivity.findViewById<AdView>(R.id.adView2).visibility = View.GONE
+                Toast.makeText(this, "Network Lost", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     }
 }

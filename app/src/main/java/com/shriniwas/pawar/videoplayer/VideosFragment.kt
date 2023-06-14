@@ -46,7 +46,6 @@ class VideosFragment : Fragment() {
             MainActivity.videoList = getAllVideos(requireContext())
             adapter.updateList(MainActivity.videoList)
             binding.totalVideos.text = "Total Videos: ${MainActivity.videoList.size}"
-
             binding.root.isRefreshing = false
         }
 
@@ -88,8 +87,8 @@ class VideosFragment : Fragment() {
         if (PlayerActivity.position != -1){
             binding.nowPlayingBtn.visibility = View.VISIBLE
         }
-        if (MainActivity.dataChanged) adapter.notifyDataSetChanged()
-        MainActivity.dataChanged = false
+        if (MainActivity.adapterChanged) adapter.notifyDataSetChanged()
+        MainActivity.adapterChanged = false
     }
 
 }

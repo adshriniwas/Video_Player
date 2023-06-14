@@ -1,37 +1,32 @@
 package com.shriniwas.pawar.videoplayer
 
-import android.Manifest
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.net.Uri
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
+import android.net.ConnectivityManager
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
-import android.provider.Settings
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MenuItem
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.google.android.gms.ads.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shriniwas.pawar.videoplayer.databinding.ActivityMainBinding
-import com.shriniwas.pawar.videoplayer.databinding.MoreFeaturesBinding
 import com.shriniwas.pawar.videoplayer.databinding.ThemeViewBinding
-import java.io.File
 import kotlin.system.exitProcess
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var toggle: ActionBarDrawerToggle
+    private var runnable: Runnable? = null
+    private lateinit var checkNetworkConnection: CheckNetworkConnection
 
     companion object{
         lateinit var videoList: ArrayList<Video>
@@ -41,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         var themeIndex: Int = 0
         val themesList = arrayOf(R.style.coolPinkNav, R.style.coolBlueNav, R.style.coolPurpleNav, R.style.coolGreenNav, R.style.coolRedNav, R.style.coolBlackNav)
         var dataChanged:Boolean = false
+        var adapterChanged:Boolean = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,6 +50,43 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 //        requestRuntimePermission()
+
+//        ads initialization
+
+
+        callNetworkConnection()
+
+        binding.adView.adListener = object : AdListener(){
+            override fun onAdClicked() {
+                super.onAdClicked()
+            }
+
+            override fun onAdClosed() {
+                super.onAdClosed()
+            }
+
+            override fun onAdFailedToLoad(p0: LoadAdError) {
+                super.onAdFailedToLoad(p0)
+//                binding.adView.visibility = View.GONE
+            }
+
+            override fun onAdImpression() {
+                super.onAdImpression()
+            }
+
+            override fun onAdLoaded() {
+                super.onAdLoaded()
+            }
+
+            override fun onAdOpened() {
+                super.onAdOpened()
+            }
+
+            override fun onAdSwipeGestureClicked() {
+                super.onAdSwipeGestureClicked()
+            }
+        }
+
         folderList = ArrayList()
         videoList = getAllVideos(this)
         toggle = ActionBarDrawerToggle(this, binding.root, R.string.open, R.string.close)
@@ -62,8 +95,18 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setFragment(VideosFragment())
 
+        runnable = Runnable {
+            if (dataChanged){
+                videoList = getAllVideos(this)
+                dataChanged = false
+                adapterChanged = true
+            }
+            Handler(Looper.getMainLooper()).postDelayed(runnable!!, 200)
+        }
+        Handler(Looper.getMainLooper()).postDelayed(runnable!!, 0)
+
         binding.bottomNav.setOnItemSelectedListener {
-            if (dataChanged) videoList = getAllVideos(this)
+
             when(it.itemId){
                 R.id.videoView -> setFragment(VideosFragment())
                 R.id.foldersView -> setFragment(FoldersFragment())
@@ -134,6 +177,33 @@ class MainActivity : AppCompatActivity() {
 //        for restarting app
         finish()
         startActivity(intent)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        runnable = null
+    }
+
+    fun loadBannerAds() {
+        MobileAds.initialize(this@MainActivity)
+        val adRequest: AdRequest = AdRequest.Builder().build()
+        this@MainActivity.findViewById<AdView>(R.id.adView).loadAd(adRequest)
+    }
+
+
+
+    private fun callNetworkConnection() {
+        checkNetworkConnection = CheckNetworkConnection(application)
+        checkNetworkConnection.observe(this) { isConnected ->
+            if (isConnected) {
+                binding.adView.visibility = View.VISIBLE
+                loadBannerAds()
+            } else {
+                binding.adView.visibility = View.GONE
+                Toast.makeText(this, "Network Lost", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     }
 
 }

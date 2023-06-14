@@ -39,6 +39,8 @@ android {
 
 dependencies {
 
+
+    implementation 'com.google.android.gms:play-services-ads:22.1.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.18.5'
     implementation 'com.github.lukelorusso:VerticalSeekBar:1.2.7'
 

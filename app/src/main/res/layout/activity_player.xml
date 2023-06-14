@@ -95,8 +95,42 @@
         app:layout_constraintEnd_toEndOf="@id/topController"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <Button
+        android:id="@+id/brightnessIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/brightness_icon"
+        android:contentDescription="@string/brightness"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="@string/brightness_val"
+        tools:ignore="RtlHardcoded"
+        android:background="#42000000"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:visibility="gone"/>
 
 
+    <Button
+        android:id="@+id/volumeIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/volume_icon"
+        android:contentDescription="@string/brightness"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="@string/brightness_val"
+        tools:ignore="RtlHardcoded"
+        android:background="#42000000"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:visibility="gone"/>
 
         <ImageButton
             android:id="@+id/playPauseBtn"

@@ -49,5 +49,7 @@
     <string name="share">Share</string>
     <string name="O">0</string>
     <string name="apply_to_all">Apply To All Upcoming Videos</string>
+    <string name="brightness">Brightness</string>
+    <string name="brightness_val">0</string>
 
 </resources>

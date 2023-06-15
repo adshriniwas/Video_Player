@@ -2,6 +2,7 @@ package com.shriniwas.pawar.videoplayer
 
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.AppOpsManager
 import android.app.PictureInPictureParams
 import android.content.Context
@@ -9,6 +10,7 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.media.AudioManager
 import android.media.audiofx.LoudnessEnhancer
@@ -27,6 +29,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import com.github.vkay94.dtpv.youtube.YouTubeOverlay
 import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -35,6 +38,7 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.exoplayer2.ui.TimeBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.shriniwas.pawar.videoplayer.databinding.ActivityPlayerBinding
 import com.shriniwas.pawar.videoplayer.databinding.BoosterBinding
 import com.shriniwas.pawar.videoplayer.databinding.MoreFeaturesBinding
@@ -49,13 +53,13 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
 
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var runnable: Runnable
-    private var isSubtitle: Boolean = true
+
     private lateinit var gestureDetectorCompat: GestureDetectorCompat
 
 
     companion object {
         private var audioManager: AudioManager? = null
-        private lateinit var player: SimpleExoPlayer
+        private lateinit var player: ExoPlayer
         lateinit var playerList: ArrayList<Video>
         var position: Int = -1
         private var repeat: Boolean = false
@@ -218,51 +222,84 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                 dialog.dismiss()
                 playVideo()
                 val audioTrack = ArrayList<String>()
+                val audioList = ArrayList<String>()
 
-
-
-                for(i in 0 until player.currentTrackGroups.length){
-
-                    val format = player.currentTrackGroups[i].getFormat(0).sampleMimeType
-                    val lang = player.currentTrackGroups[i].getFormat(0).language
-                    val id = player.currentTrackGroups[i].getFormat(0).id
-
-                    if (format!!.contains("audio") && id != null && lang != null) {
-                        //System.out.println(lang + " " + id);
-                        audioTrack.add(Locale(player.currentTrackGroups.get(i).getFormat(0).language.toString()).displayLanguage)
+                for(group in player.currentTracksInfo.trackGroupInfos){
+                    if(group.trackType == C.TRACK_TYPE_AUDIO){
+                        val groupInfo = group.trackGroup
+                        for (i in 0 until groupInfo.length){
+                            audioTrack.add(groupInfo.getFormat(i).language.toString())
+                            audioList.add("${audioList.size + 1}. " + Locale(groupInfo.getFormat(i).language.toString()).displayLanguage
+                                    + " (${groupInfo.getFormat(i).label})")
+                        }
                     }
-
                 }
 
-                val tempTracks = audioTrack.toArray(arrayOfNulls<CharSequence>(audioTrack.size))
+                if(audioList[0].contains("null")) audioList[0] = "1. Default Track"
 
-                MaterialAlertDialogBuilder(this, R.style.alertDialog)
+
+                val tempTracks = audioList.toArray(arrayOfNulls<CharSequence>(audioList.size))
+
+                val audioDialog = MaterialAlertDialogBuilder(this, R.style.alertDialog)
                     .setTitle("Select Language")
                     .setOnCancelListener { playVideo() }
-                    .setBackground(ColorDrawable(0x803700B3.toInt()))
+                    .setPositiveButton("Off Audio"){ self, _ ->
+                        trackSelector.setParameters(trackSelector.buildUponParameters().setRendererDisabled(
+                            C.TRACK_TYPE_AUDIO, true
+                        ))
+                        self.dismiss()
+                    }
                     .setItems(tempTracks){_,position ->
-                        Toast.makeText(this, audioTrack[position] + "Selected", Toast.LENGTH_SHORT).show()
-                        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredAudioLanguage(audioTrack[position]))
+                        Snackbar.make(binding.root, audioList[position] + " Selected", 3000).show()
+                        trackSelector.setParameters(trackSelector.buildUponParameters()
+                            .setRendererDisabled(C.TRACK_TYPE_AUDIO, false)
+                            .setPreferredAudioLanguage(audioTrack[position]))
                     }
                     .create()
-                    .show()
+                audioDialog.show()
+                audioDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.WHITE)
+                audioDialog.window?.setBackgroundDrawable(ColorDrawable(0x99000000.toInt()))
             }
 
             bindingMF.subtitlesBtn.setOnClickListener {
-                if (isSubtitle) {
-                    trackSelector.parameters =  DefaultTrackSelector.ParametersBuilder(this)
-                        .setRendererDisabled(C.TRACK_TYPE_VIDEO, true).build()
-                    Toast.makeText(this,"Subtitles Off", Toast.LENGTH_SHORT).show()
-                    isSubtitle = false
-                }
-                else {
-                    trackSelector.parameters =  DefaultTrackSelector.ParametersBuilder(this)
-                        .setRendererDisabled(C.TRACK_TYPE_VIDEO, false).build()
-                    Toast.makeText(this, "Subtitles On", Toast.LENGTH_SHORT).show()
-                    isSubtitle = true
-                }
                 dialog.dismiss()
                 playVideo()
+                val subtitles = ArrayList<String>()
+                val subtitlesList = ArrayList<String>()
+
+                for(group in player.currentTracksInfo.trackGroupInfos){
+                    if(group.trackType == C.TRACK_TYPE_TEXT){
+                        val groupInfo = group.trackGroup
+                        for (i in 0 until groupInfo.length){
+                            subtitles.add(groupInfo.getFormat(i).language.toString())
+                            subtitlesList.add("${subtitlesList.size + 1}. " + Locale(groupInfo.getFormat(i).language.toString()).displayLanguage
+                                    + " (${groupInfo.getFormat(i).label})")
+                        }
+                    }
+                }
+
+
+                val tempTracks = subtitlesList.toArray(arrayOfNulls<CharSequence>(subtitlesList.size))
+
+                val sDialog = MaterialAlertDialogBuilder(this, R.style.alertDialog)
+                    .setTitle("Select Subtitles")
+                    .setOnCancelListener { playVideo() }
+                    .setPositiveButton("Off Subtitles"){ self, _ ->
+                        trackSelector.setParameters(trackSelector.buildUponParameters().setRendererDisabled(
+                            C.TRACK_TYPE_VIDEO, true
+                        ))
+                        self.dismiss()
+                    }
+                    .setItems(tempTracks){_,position ->
+                        Snackbar.make(binding.root, subtitlesList[position] + " Selected", 3000).show()
+                        trackSelector.setParameters(trackSelector.buildUponParameters()
+                            .setRendererDisabled(C.TRACK_TYPE_VIDEO, false)
+                            .setPreferredTextLanguage(subtitles[position]))
+                    }
+                    .create()
+                sDialog.show()
+                sDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.WHITE)
+                sDialog.window?.setBackgroundDrawable(ColorDrawable(0x99000000.toInt()))
             }
             bindingMF.audioBoosterBtn.setOnClickListener {
                 dialog.dismiss()
@@ -399,7 +436,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
         binding.videoTitle.text = playerList[position].title
         binding.videoTitle.isSelected = true
 
-        player = SimpleExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
+        player = ExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
         doubleTapEnable()
 
 

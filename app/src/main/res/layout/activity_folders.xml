@@ -31,7 +31,7 @@
         android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
         ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+        ads:adUnitId="@string/banner_ad2">
     </com.google.android.gms.ads.AdView>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

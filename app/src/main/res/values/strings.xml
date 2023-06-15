@@ -52,4 +52,8 @@
     <string name="brightness">Brightness</string>
     <string name="brightness_val">0</string>
 
+    <string name="interstitial_ad">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="banner_ad1">ca-app-pub-2452674421687131/2189475954</string>
+    <string name="banner_ad2">ca-app-pub-2452674421687131/6445211896</string>
+
 </resources>

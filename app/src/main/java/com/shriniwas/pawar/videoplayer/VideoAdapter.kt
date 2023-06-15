@@ -3,11 +3,13 @@ package com.shriniwas.pawar.videoplayer
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.media.MediaScannerConnection
 import android.net.Uri
+
 import android.text.SpannableStringBuilder
 import android.text.format.DateUtils
 import android.text.format.Formatter
@@ -16,8 +18,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+
 import androidx.core.text.bold
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -74,9 +76,10 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
                     .setPositiveButton("Resume") { self, _ ->
                         var adRequest = AdRequest.Builder().build()
 
+
                         InterstitialAd.load(
                             context,
-                            "ca-app-pub-3940256099942544/1033173712",
+                            context.getString(R.string.interstitial_ad),
                             adRequest,
                             object : InterstitialAdLoadCallback() {
                                 override fun onAdFailedToLoad(adError: LoadAdError) {
@@ -164,7 +167,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
                         InterstitialAd.load(
                             context,
-                            "ca-app-pub-3940256099942544/1033173712",
+                            context.getString(R.string.interstitial_ad),
                             adRequest,
                             object : InterstitialAdLoadCallback() {
                                 override fun onAdFailedToLoad(adError: LoadAdError) {
@@ -260,7 +263,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
 
                 InterstitialAd.load(
                     context,
-                    "ca-app-pub-3940256099942544/1033173712",
+                    context.getString(R.string.interstitial_ad),
                     adRequest,
                     object : InterstitialAdLoadCallback() {
                         override fun onAdFailedToLoad(adError: LoadAdError) {

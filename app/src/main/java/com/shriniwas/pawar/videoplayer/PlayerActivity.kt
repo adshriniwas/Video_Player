@@ -369,7 +369,7 @@ class PlayerActivity : AppCompatActivity(), AudioManager.OnAudioFocusChangeListe
                                     exitProcess(1)
                                 }
                             }
-                            timer!!.schedule(task, sleepTime*1000.toLong())
+                            timer!!.schedule(task, sleepTime*60*1000.toLong())
                             self.dismiss()
                             playVideo()
                         }

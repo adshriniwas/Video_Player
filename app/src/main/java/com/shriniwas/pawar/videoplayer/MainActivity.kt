@@ -1,5 +1,6 @@
 package com.shriniwas.pawar.videoplayer
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -177,14 +178,20 @@ class MainActivity : AppCompatActivity() {
         editor.apply()
 
 //        for restarting app
-        finish()
-        startActivity(intent)
+        try {
+            finishAfterTransition()
+            startActivity(intent)
+        }catch (e : Exception){
+
+        }
+
+
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        runnable = null
-    }
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        runnable = null
+//    }
 
     fun loadBannerAds() {
         MobileAds.initialize(this@MainActivity)

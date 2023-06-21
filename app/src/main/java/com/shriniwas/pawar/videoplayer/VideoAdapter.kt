@@ -58,7 +58,7 @@ class VideoAdapter(private val context: Context, private var videoList: ArrayLis
     }
 
     @SuppressLint("NotifyDataSetChanged", "SuspiciousIndentation")
-    override fun onBindViewHolder(holder: VideoAdapter.MyHolder, position: Int) {
+    override fun onBindViewHolder(holder: VideoAdapter.MyHolder, @SuppressLint("RecyclerView") position: Int) {
         holder.title.text = videoList[position].title
         holder.folder.text = videoList[position].folderName
         holder.duration.text = DateUtils.formatElapsedTime(videoList[position].duration/1000)
